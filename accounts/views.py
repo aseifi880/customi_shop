@@ -5,8 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .serializers import RegisterSerializer, LoginSerializer
-
+from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer
 
 
 class RegisterView(APIView):
@@ -35,6 +34,7 @@ class RegisterView(APIView):
             "email": email,
         }, status=status.HTTP_201_CREATED)
 
+
 class LoginView(APIView):
 
     def post(self, request: Request):
@@ -42,8 +42,30 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user = User.objects.get(email=serializer.validated_data['email'])
-        refresh = RefreshToken.for_user(user)
+        tokens = user.get_tokens()
+        return Response(tokens, status=status.HTTP_200_OK)
+
+
+class RequestOTPView(APIView):
+    def post(self, request: Request):
+        serializer = RequestOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data['phone']
+        password = serializer.validated_data['password']
+        user = User.objects.get(phone=phone)
+
+        if user.check_password(password):
+            user.otp_code.generate_code()
+            print(f"Your OTP code is {user.otp_code.code}")
+            return Response({
+                "message": "کد یکبار مصرف ارسال شد."
+            })
+
         return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-        }, status=status.HTTP_200_OK)
+            "message": "اطلاعات وارد شده صحیح نمی باشد."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyOTPView(APIView):
+    def post(self, request: Request):
+        pass
