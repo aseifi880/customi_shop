@@ -2,8 +2,8 @@ from django.contrib.auth.base_user import BaseUserManager
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password, phone):
-        if not email and not phone:
+    def create_user(self, email, password, phone=None):
+        if (not email) and (not phone):
             raise ValueError('کاربر باید ایمیل یا تلفن همراه داشته باشد.')
         email = self.normalize_email(email)
         user = self.model(email=email, phone=phone)

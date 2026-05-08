@@ -1,3 +1,49 @@
-from django.shortcuts import render
+from rest_framework import status
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
-# Create your views here.
+from .models import User
+from .serializers import RegisterSerializer, LoginSerializer
+
+
+
+class RegisterView(APIView):
+
+    def post(self, request: Request):
+        serializer = RegisterSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
+
+        user = User.objects.get(email=email)
+
+        if user:
+            return Response("مقادیر وارد شده قابل قبول نیست.", status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            User.objects.create_user(email=email, password=password)
+        except ValueError as e:
+            return Response({
+                'error': str(e),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "message": "کاربر با موفقیت ایجاد شد.",
+            "email": email,
+        }, status=status.HTTP_201_CREATED)
+
+class LoginView(APIView):
+
+    def post(self, request: Request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.get(email=serializer.validated_data['email'])
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        }, status=status.HTTP_200_OK)

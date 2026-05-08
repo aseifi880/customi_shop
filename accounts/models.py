@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
-
+from accounts.managers import CustomUserManager
 from core.base_model import BaseModel
 
 
@@ -22,6 +22,8 @@ class User(AbstractUser, BaseModel):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
 
 class Province(BaseModel):
