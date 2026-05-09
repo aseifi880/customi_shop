@@ -4,8 +4,8 @@ from django.contrib.auth.base_user import BaseUserManager
 class CustomUserManager(BaseUserManager):
     def create_user(self, password: str, email: str=None, phone: str=None):
         """
-        Checks if either email or phone is provided if true tries to
-        create a new user if given values are valid
+        Tries to create a new user if given values are valid, then creates a PhoneOTP
+        instance for the created user.
         """
         try:
             email = self.normalize_email(email)
