@@ -53,7 +53,7 @@ class User(AbstractUser, BaseModel):
         """
         check if given code is valid for this user
         """
-        if self.otp_code and self.otp_code == code:
+        if self.otp_code.code == code:
             return True
         return False
 
