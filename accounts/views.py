@@ -1,14 +1,15 @@
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.mixins import DestroyModelMixin
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer, VerifyOTPSerializer
+from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer, VerifyOTPSerializer, \
+    UserRetrieveViewSerializer, UserUpdateViewSerializer
 
 
 class RegisterView(APIView):
@@ -101,3 +102,19 @@ class VerifyOTPView(APIView):
         return Response({
             "error": "کد وارد شده صحیح نمیباشد."
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserView(RetrieveUpdateDestroyAPIView):
+
+    permission_classes = [IsAuthenticated]
+
+    queryset = User.objects.all()
+
+    def get_object(self):
+        return self.request.user
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return UserRetrieveViewSerializer
+        return UserUpdateViewSerializer
+
