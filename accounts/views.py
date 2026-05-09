@@ -1,15 +1,15 @@
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
-from rest_framework.mixins import DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.viewsets import ModelViewSet
 
-from .models import User
+
+from .models import User, Address
 from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer, VerifyOTPSerializer, \
-    UserRetrieveViewSerializer, UserUpdateViewSerializer
+    UserRetrieveViewSerializer, UserUpdateViewSerializer, UserAddressRetrieveCreateSerializer, UserAddressUpdateSerializer
 
 
 class RegisterView(APIView):
@@ -117,4 +117,15 @@ class UserView(RetrieveUpdateDestroyAPIView):
         if self.request.method in SAFE_METHODS:
             return UserRetrieveViewSerializer
         return UserUpdateViewSerializer
+
+
+class UserAddressViewSet(ModelViewSet):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
