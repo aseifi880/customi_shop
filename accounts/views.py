@@ -148,7 +148,7 @@ class RegisterAsSellerView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         store = Store.objects.create(
-            user=user,
+            owner=user,
             name=serializer.validated_data['name'],
             address=serializer.validated_data['address'],
             description=serializer.validated_data['description'],
