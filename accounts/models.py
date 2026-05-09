@@ -16,7 +16,8 @@ from core.base_model import BaseModel
 class User(AbstractUser, BaseModel):
 
     email = models.EmailField(unique=True, null=True, blank=True)
-    phone = models.CharField(max_length=11, unique=True, null=True, blank=True)
+    phone = models.CharField(max_length=11, unique=True, null=True, blank=True,
+                             validators=[RegexValidator(regex=r'^09\d{9}$',)])
     is_seller = models.BooleanField(default=False)
 
 
