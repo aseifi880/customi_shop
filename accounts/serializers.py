@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from accounts.models import User
+from accounts.models import User, Address, Province, City
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -40,3 +40,14 @@ class UserUpdateViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'first_name', 'last_name', 'phone')
+
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = "__all__"
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+        }
