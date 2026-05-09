@@ -2,6 +2,7 @@ import random
 from datetime import timedelta
 from typing import Dict
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -55,7 +56,7 @@ class User(AbstractUser, BaseModel):
 
 
 class PhoneOTP(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='otp_code')
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='otp_code')
     expires_at = models.DateTimeField()
     code = models.CharField()
 
@@ -96,7 +97,7 @@ class Address(BaseModel):
     label = models.CharField(max_length=11, unique=True, null=True, blank=True)
     province = models.ForeignKey(Province, on_delete=models.PROTECT, null=True)
     city = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='addresses')
     full_address = models.TextField(null=True, blank=True)
     postal_code = models.CharField(max_length=11, unique=True, null=True, blank=True,
                                    validators=[RegexValidator('^[0-9]{6,}$',
