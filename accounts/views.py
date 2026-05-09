@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import User, Address
 from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer, VerifyOTPSerializer, \
-    UserRetrieveViewSerializer, UserUpdateViewSerializer, UserAddressRetrieveCreateSerializer, UserAddressUpdateSerializer
+    UserRetrieveViewSerializer, UserUpdateViewSerializer, UserAddressSerializer
 
 
 class RegisterView(APIView):
@@ -122,6 +122,7 @@ class UserView(RetrieveUpdateDestroyAPIView):
 class UserAddressViewSet(ModelViewSet):
 
     permission_classes = (IsAuthenticated,)
+    serializer_class = UserAddressSerializer
 
     def get_queryset(self):
         return Address.objects.filter(user=self.request.user)
