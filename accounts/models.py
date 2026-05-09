@@ -4,7 +4,6 @@ from typing import Dict
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
@@ -58,28 +57,48 @@ class User(AbstractUser, BaseModel):
             return True
         return False
 
+    def save(self, *args,**kwargs):
+        super().save(*args, **kwargs)
+        otp, created =PhoneOTP.objects.get_or_create(user_id=self.id)
+        otp.code = None
+        otp.expires_at = None
+        otp.save()
 
-    USERNAME_FIELD = 'email' or 'phone'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
 
 class PhoneOTP(BaseModel):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='otp_code')
-    expires_at = models.DateTimeField()
-    code = models.CharField()
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='otp_code', )
+    expires_at = models.DateTimeField(null=True)
+    code = models.CharField(null=True)
 
     def has_expired(self):
+        """
+        returns True if instane doesn't have an expires_at value,
+        or simply checks if expires_at time has passed.
+        """
+        if not self.expires_at:
+            return True
         return self.expires_at < timezone.now()
 
     def remaining_time(self):
+        """
+        returns remaining time for otp code in seconds
+        """
         if not self.has_expired():
             remaining = self.expires_at - timezone.now()
             return remaining.total_seconds()
         return 0
 
     def generate_code(self):
+        """
+        generates a new code if the old one has expired, and sets
+        expires_at for 5min later,
+        o.w raise exception
+        """
         if not self.has_expired():
             raise ValueError(f" ثانیه دوباره تلاش کنید.{self.remaining_time()}لطفا بعد از ")
         otp_code = random.randint(100000, 999999)
