@@ -14,11 +14,11 @@ from core.base_model import BaseModel
 
 
 class User(AbstractUser, BaseModel):
-
     email = models.EmailField(unique=True, null=True, blank=True)
     phone = models.CharField(max_length=11, unique=True, null=True, blank=True,
                              validators=[RegexValidator(regex=r'^09\d{9}$',)])
     is_seller = models.BooleanField(default=False)
+    username = models.CharField(default=email)
 
     def make_seller(self) -> bool|None:
         """
@@ -59,10 +59,7 @@ class User(AbstractUser, BaseModel):
 
     def save(self, *args,**kwargs):
         super().save(*args, **kwargs)
-        otp, created =PhoneOTP.objects.get_or_create(user_id=self.id)
-        otp.code = None
-        otp.expires_at = None
-        otp.save()
+        otp, _ =PhoneOTP.objects.get_or_create(user=self)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -72,8 +69,8 @@ class User(AbstractUser, BaseModel):
 
 class PhoneOTP(BaseModel):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='otp_code', )
-    expires_at = models.DateTimeField(null=True)
-    code = models.CharField(null=True)
+    expires_at = models.DateTimeField(null=True, default=None)
+    code = models.CharField(null=True, default=None)
 
     def has_expired(self):
         """

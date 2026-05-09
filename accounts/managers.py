@@ -14,7 +14,7 @@ class CustomUserManager(BaseUserManager):
             user.save(using=self._db)
             return user
         except Exception as e:
-            raise ValueError('اطلاعات وارد شده قابل قبول نیست.')
+            raise ValueError(str(e))
 
     def create_superuser(self, email, phone, password,**extra_fields):
         if not email and not phone:
