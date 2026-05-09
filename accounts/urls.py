@@ -18,7 +18,7 @@ urlpatterns = [
 
 
     path('myuser/', views.UserView.as_view(), name='user'),
-    path('myuser/register_as_seller', views.RegisterAsSellerView.as_view(), name='register_as_seller'),
+    path('myuser/register_as_seller/', views.RegisterAsSellerView.as_view(), name='register_as_seller'),
 
 ]
 urlpatterns += router.urls
