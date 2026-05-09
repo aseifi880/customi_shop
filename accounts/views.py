@@ -78,16 +78,16 @@ class RequestOTPView(APIView):
         password = serializer.validated_data['password']
         user = User.objects.get(phone=phone)
 
-        if user.check_password(password):
-            user.otp_code.generate_code()
-            user.send_otp(phone)
+        if not user.check_password(password):
             return Response({
-                "message": "کد یکبار مصرف ارسال شد."
-            })
+                "error": "اطلاعات وارد شده صحیح نمی باشد."
+            }, status=status.HTTP_400_BAD_REQUEST)
 
+        user.otp_code.generate_code()
+        user.send_otp()
         return Response({
-            "error": "اطلاعات وارد شده صحیح نمی باشد."
-        }, status=status.HTTP_400_BAD_REQUEST)
+            "message": "کد یکبار مصرف ارسال شد."
+        }, status=status.HTTP_200_OK)
 
 
 class VerifyOTPView(APIView):
