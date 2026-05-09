@@ -10,8 +10,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('email', 'phone','password')
         extra_kwargs = {
             'password': {'write_only': True, 'required': True},
-            'email': {'required': False},
-            'phone': {'required': False}
+            'email': {'required': True},
+            'phone': {'required': True}
                         }
 
 

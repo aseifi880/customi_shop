@@ -1,3 +1,4 @@
+from django.core.serializers import serialize
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
@@ -6,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-
+from stores.models import Store
+from stores.serializers import StoreSerializer
 from .models import User, Address
 from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer, VerifyOTPSerializer, \
     UserRetrieveViewSerializer, UserUpdateViewSerializer, UserAddressSerializer
@@ -20,14 +22,13 @@ class RegisterView(APIView):
     """
     def post(self, request: Request):
         serializer = RegisterSerializer(data=request.data)
-
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        phone = serializer.validated_data['phone']
-        password = serializer.validated_data['password']
 
+        try:
         # credential validation happens inside the manager and model.
-        user = User.objects.create_user(password, email=email, phone=phone)
+            user = User.objects.create_user(**serializer.validated_data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         if not user:
             return Response({
@@ -132,4 +133,30 @@ class UserAddressViewSet(ModelViewSet):
 
 
 class RegisterAsSellerView(APIView):
-    pass
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request: Request):
+        serializer = StoreSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        is_made_seller = user.make_seller()
+
+        if not is_made_seller:
+            return Response({
+                "error": "کاربر در حال حاضر فروشنده است."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        store = Store.objects.create(
+            user=user,
+            name=serializer.validated_data['name'],
+            address=serializer.validated_data['address'],
+            description=serializer.validated_data['description'],
+        )
+
+        return Response({
+            "message": "کاربر با موفقیت تبدیل به فروشنده شد.",
+            "data": StoreSerializer(store).data
+        })
+
+

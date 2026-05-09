@@ -21,6 +21,16 @@ class User(AbstractUser, BaseModel):
                              validators=[RegexValidator(regex=r'^09\d{9}$',)])
     is_seller = models.BooleanField(default=False)
 
+    def make_seller(self) -> bool|None:
+        """
+        returns True and sets is_seller=True if the user wasn't a seller, otherwise if they
+        are already a seller (they have a store) returns None
+        """
+        if not self.is_seller:
+            self.is_seller = True
+            self.save()
+            return self.is_seller
+        return None
 
     def send_otp(self):
         if not self.phone:
@@ -49,7 +59,7 @@ class User(AbstractUser, BaseModel):
         return False
 
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'email' or 'phone'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()

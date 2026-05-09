@@ -7,14 +7,14 @@ class CustomUserManager(BaseUserManager):
         Checks if either email or phone is provided if true tries to
         create a new user if given values are valid
         """
-        if (not email) and (not phone):
-            raise ValueError('کاربر باید ایمیل یا تلفن همراه داشته باشد.')
-
-        email = self.normalize_email(email) if email else None
-        phone = phone if phone else None
-        user = self.model(email=email, phone=phone)
-        user.set_password(password)
-        user.save(using=self._db)
+        try:
+            email = self.normalize_email(email)
+            user = self.model(email=email, phone=phone)
+            user.set_password(password)
+            user.save(using=self._db)
+            return user
+        except Exception as e:
+            raise ValueError('اطلاعات وارد شده قابل قبول نیست.')
 
     def create_superuser(self, email, phone, password,**extra_fields):
         if not email and not phone:
