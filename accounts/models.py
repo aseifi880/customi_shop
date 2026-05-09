@@ -20,20 +20,32 @@ class User(AbstractUser, BaseModel):
     is_seller = models.BooleanField(default=False)
 
 
+    def send_otp(self):
+        if not self.phone:
+            return None
+        # will be replaced with an sms api code
+        print(f"OTP code for {self.phone} is {self.otp_code.code}")
+        return True
+
+
     def get_tokens(self) -> Dict[str, str]:
+        """
+        Returns a dict that contains access and refresh tokens
+        """
         refresh = RefreshToken.for_user(self)
         return {
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
 
+    def validate_code(self, code: str) -> bool:
+        """
+        check if given code is valid for this user
+        """
+        if self.otp_code and self.otp_code == code:
+            return True
+        return False
 
-    def full_clean(
-        self, exclude = None, validate_unique = True, validate_constraints = True
-    ):
-        if self.phone and not self.phone.startswith('09'):
-            return ValidationError('شماره تلفن معتبر نیست.')
-        return None
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -86,7 +98,7 @@ class Address(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
     full_address = models.TextField(null=True, blank=True)
     postal_code = models.CharField(max_length=11, unique=True, null=True, blank=True,
-                                   validators=[RegexValidator('^[0-9]{6,}\$',
+                                   validators=[RegexValidator('^[0-9]{6,}$',
                                                              "کد پستی معتبر نیست.")])
     is_default = models.BooleanField(default=False)
 

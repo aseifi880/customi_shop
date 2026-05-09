@@ -4,13 +4,16 @@ from accounts.models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ('email', 'phone','password')
-        extra_kwargs = {'password': {'write_only': True},
-                        'email': {'required': False},
-                        'phone': {'required': False}
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': True},
+            'email': {'required': False},
+            'phone': {'required': False}
                         }
+
 
 
 class LoginSerializer(serializers.Serializer):
