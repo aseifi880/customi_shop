@@ -21,8 +21,10 @@ class Store(BaseModel):
 
 
 class Category(BaseModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.name
 
 class Product(BaseModel):
     name = models.CharField(max_length=100)
@@ -31,6 +33,7 @@ class Product(BaseModel):
     image = models.ImageField(null=False, blank=False, upload_to='stores/product_images')
     description = models.TextField(null=False, blank=False)
     stock = models.PositiveIntegerField(default=0)
+    price = models.PositiveBigIntegerField()
 
     def __str__(self):
         return self.name
