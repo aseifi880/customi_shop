@@ -110,6 +110,8 @@ class Province(BaseModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
 
 class City(BaseModel):
     province = models.ForeignKey(Province, on_delete=models.CASCADE)
@@ -117,6 +119,11 @@ class City(BaseModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = 'cities'
+        unique_together = ('province', 'name',)
 
 
 class Address(BaseModel):
@@ -142,3 +149,7 @@ class Address(BaseModel):
 
     def __str__(self):
         return f"{self.label} - {self.city}"
+
+    class Meta:
+        ordering = ['province', 'city', 'label']
+        verbose_name_plural = 'addresses'
