@@ -8,4 +8,5 @@ admin.site.index_title = "مدیریت"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('accounts.urls')),
+    path('api/', include('stores.urls')),
 ]
