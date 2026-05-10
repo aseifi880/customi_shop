@@ -16,10 +16,10 @@ class CustomUserManager(BaseUserManager):
         except Exception as e:
             raise ValueError(str(e))
 
-    def create_superuser(self, email, phone, password,**extra_fields):
-        if not email and not phone:
-            raise ValueError('کاربر باید ایمیل یا تلفن همراه داشته باشد.')
-        user = self.model(email=email, phone=phone)
+    def create_superuser(self, email, password, **extra_fields):
+        if not email:
+            raise ValueError('کاربر باید ایمیل داشته باشد.')
+        user = self.model(email=email)
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
