@@ -120,13 +120,13 @@ class City(BaseModel):
 
 
 class Address(BaseModel):
-    label = models.CharField(max_length=11, unique=True, null=True, blank=True)
-    province = models.ForeignKey(Province, on_delete=models.PROTECT, null=True)
-    city = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
+    label = models.CharField(max_length=11)
+    province = models.ForeignKey(Province, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='addresses')
-    full_address = models.TextField(null=True, blank=True)
-    postal_code = models.CharField(max_length=11, unique=True, null=True, blank=True,
-                                   validators=[RegexValidator('^[0-9]{6,}$',
+    full_address = models.TextField()
+    postal_code = models.CharField(max_length=11, unique=True,
+                                   validators=[RegexValidator(r'^\d{6,}$',
                                                              "کد پستی معتبر نیست.")])
     is_default = models.BooleanField(default=False)
 
