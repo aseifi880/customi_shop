@@ -45,9 +45,10 @@ class UserUpdateViewSerializer(serializers.ModelSerializer):
 class UserAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = "__all__"
+        fields = ['label', 'city', 'province', 'full_address', 'postal_code', 'created_at']
         extra_kwargs = {
             'id': {'read_only': True},
+            'user': {'read_only': True},
             'created_at': {'read_only': True},
             'updated_at': {'read_only': True},
         }
