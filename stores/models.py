@@ -26,6 +26,10 @@ class Category(BaseModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = 'categories'
+
 class Product(BaseModel):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
@@ -34,6 +38,9 @@ class Product(BaseModel):
     description = models.TextField(null=False, blank=False)
     stock = models.PositiveIntegerField(default=0)
     price = models.PositiveBigIntegerField()
+
+    def in_stock(self):
+        return self.stock > 0
 
     def __str__(self):
         return self.name
@@ -46,7 +53,7 @@ class StoreItem(BaseModel):
 
 
 class Cart(BaseModel):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='carts')
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, related_name='cart')
 
 
 class CartItem(BaseModel):
