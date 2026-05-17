@@ -10,9 +10,11 @@ class ProductFilter(django_filters.FilterSet):
 
     class Meta:
         model = Product
+        fields = ('min_price', 'max_price', 'name',)
 
 class CategoryFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
 
     class Meta:
         model = Category
+        fields = ('name',)
