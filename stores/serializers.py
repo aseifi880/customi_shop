@@ -3,13 +3,6 @@ from rest_framework import serializers
 from stores.models import Store, Product, Category
 
 
-class StoreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Store
-        fields = ['name', 'description', 'address', 'owner', 'created_at']
-        read_only_fields = ['created_at', 'owner']
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -23,7 +16,17 @@ class ProductRetrieveSerializer(serializers.Serializer):
     image = serializers.ImageField(use_url=True)
     stock = serializers.IntegerField()
     category = CategorySerializer()
+    in_stock = serializers.BooleanField()
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'image', 'stock', 'category']
+        fields = ['name', 'description', 'image', 'stock', 'category', 'in_stock']
+
+
+class StoreSerializer(serializers.ModelSerializer):
+    products =  ProductRetrieveSerializer(many=True)
+
+    class Meta:
+        model = Store
+        fields = ['name', 'description', 'address', 'owner', 'created_at']
+        read_only_fields = ['created_at', 'owner']
