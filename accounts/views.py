@@ -1,7 +1,6 @@
-from django.core.serializers import serialize
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS, IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,9 +10,10 @@ from stores.models import Store
 from stores.serializers import StoreSerializer
 from .models import User, Address
 from .serializers import RegisterSerializer, LoginSerializer, RequestOTPSerializer, VerifyOTPSerializer, \
-    UserRetrieveViewSerializer, UserUpdateViewSerializer, UserAddressSerializer
+    UserRetrieveViewSerializer, UserUpdateViewSerializer, UserAddressSerializer, UserViewSetSerializer
 
 
+#region Auth
 class RegisterView(APIView):
     """
     Register a new user using either email, phone or both.
@@ -103,7 +103,13 @@ class VerifyOTPView(APIView):
         return Response({
             "error": "کد وارد شده صحیح نمیباشد."
         }, status=status.HTTP_400_BAD_REQUEST)
+#endregion
 
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.all_objects.all()
+    serializer_class = UserViewSetSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 class UserView(RetrieveUpdateDestroyAPIView):
 
